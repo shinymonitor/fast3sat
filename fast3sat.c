@@ -3,17 +3,17 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <time.h>
-
+//======================CONFIG========================
 #define M 42
 #define N 10
 #define TESTS 10000
-
+//=======================TYPES=========================
 typedef struct {bool solved, answer; size_t pos_count, neg_count;} Variable;
 typedef struct {Variable variables[N];} VariableList;
 typedef struct {bool negation; size_t variable_number;} Term;
 typedef struct {bool solved; Term terms[3];} Clause;
 typedef struct {Clause clauses[M];} Statement;
-
+//======================SOLVER========================
 static inline bool fast3sat_solver(Statement* statement, VariableList* variable_list){
     for (size_t i=0; i<N; ++i) {
         for (size_t j=0; j<M; ++j){
@@ -71,7 +71,7 @@ static inline bool fast3sat_solver(Statement* statement, VariableList* variable_
     }
     return evaluate(statement, variable_list);
 }
-
+//======================HELPER FUNCTIONS========================
 static inline bool evaluate(Statement* statement, VariableList* variable_list){
     for (size_t i=0; i<M; ++i){
         bool satisfied=false;
@@ -83,7 +83,6 @@ static inline bool evaluate(Statement* statement, VariableList* variable_list){
     }
     return true;
 }
-
 bool brute_force(Statement* statement, VariableList* variable_list) {
     for (size_t assignment = 0; assignment < (1U << N); ++assignment) {
         for (size_t i = 0; i < N; ++i) variable_list->variables[i].answer = (assignment >> i) & 1;
@@ -91,7 +90,6 @@ bool brute_force(Statement* statement, VariableList* variable_list) {
     }
     return false;
 }
-
 void generate_random_formula(Statement* statement) {
     for (size_t i = 0; i < M; ++i) {
         for (uint8_t j = 0; j < 3; ++j) {
@@ -100,7 +98,7 @@ void generate_random_formula(Statement* statement) {
         }
     }
 }
-
+//======================TESTS========================
 int main() {
     srand(time(0));
     size_t brute_force_count = 0;

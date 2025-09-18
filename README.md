@@ -31,5 +31,4 @@ This algorithm uses frequency-based greedy variable assignment to find satisfyin
 # Limitations
 - Incomplete: Cannot solve all satisfiable instances
 - No backtracking: May get stuck in local optima
-- Frequency dependency: Struggles when variables have similar occurrence counts
 - No clause learning: Doesn't learn from conflicts
