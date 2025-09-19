@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <time.h>
 //======================CONFIG========================
-#define M 42
+#define M 20
 #define N 10
 #define TESTS 10000
 //=======================TYPES=========================
@@ -119,4 +119,5 @@ int main() {
     printf("\nPerformance Analysis:\n");
     printf("FAST3SAT vs Truth:  %.1f%% efficiency\n",brute_force_count > 0 ? 100.0 * solver_count / brute_force_count : 0);
     return 0;
+
 }
