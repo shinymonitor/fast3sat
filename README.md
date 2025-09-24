@@ -1,4 +1,8 @@
-# FAST3SAT
+<div align="center">
+    <img src="assets/LOGO.png", width="200"/>
+    <h1>FAST3SAT</h1>
+</div>
+
 A fast, purely deterministic solver for a subset of 3SAT problems. 
 This algorithm uses frequency-based greedy variable assignment to find satisfying solutions in polynomial time. 
 
