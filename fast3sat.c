@@ -13,6 +13,8 @@ typedef struct {Variable variables[N];} VariableList;
 typedef struct {bool negation; size_t variable_number;} Term;
 typedef struct {bool solved; Term terms[3];} Clause;
 typedef struct {Clause clauses[M];} Statement;
+//=======================DCLR=========================
+static inline bool evaluate(Statement* statement, VariableList* variable_list);
 //======================SOLVER========================
 static inline bool fast3sat_solver(Statement* statement, VariableList* variable_list){
     for (size_t i=0; i<N; ++i) {
