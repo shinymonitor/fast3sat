@@ -4,9 +4,9 @@
 #include <stdlib.h>
 #include <time.h>
 //======================CONFIG========================
-#define M 20
-#define N 10
-#define TESTS 10000
+#define M 40
+#define N 20
+#define TESTS 1000
 //=======================TYPES=========================
 typedef struct {bool solved, answer; size_t pos_count, neg_count;} Variable;
 typedef struct {Variable variables[N];} VariableList;
@@ -15,6 +15,7 @@ typedef struct {bool solved; Term terms[3];} Clause;
 typedef struct {Clause clauses[M];} Statement;
 //=======================DCLR=========================
 static inline bool evaluate(Statement* statement, VariableList* variable_list);
+clock_t c1, c2;
 //======================SOLVER========================
 static inline bool fast3sat_solver(Statement* statement, VariableList* variable_list){
     for (size_t i=0; i<N; ++i) {
@@ -105,21 +106,37 @@ int main() {
     srand(time(0));
     size_t brute_force_count = 0;
     size_t solver_count = 0;
-    for (size_t n=0; n<TESTS; ++n){
+    float brute_force_time_accumaltor=0;
+    float solver_time_accumaltor=0;
+    for (size_t n=0; n<TESTS+1; ++n){
         Statement statement = {0};
         generate_random_formula(&statement);
         VariableList variable_list1 = {0};
         VariableList variable_list2 = {0};
+        c1=clock();
         bool brute_force_result = brute_force(&statement, &variable_list1);
+        c2=clock();
+        brute_force_time_accumaltor+=((float)c2-(float)c1)/CLOCKS_PER_SEC;
         if (brute_force_result) ++brute_force_count;
+        c1=clock();
         bool solver_result = fast3sat_solver(&statement, &variable_list2);
+        c2=clock();
+        solver_time_accumaltor+=((float)c2-(float)c1)/CLOCKS_PER_SEC;
         if (solver_result) ++solver_count;
+        //======================PROGRESS PRINT========================
+        printf("\x1b[2J\x1b[H");
+        printf("(TEST #%zu/%d) ", n, TESTS);
+        for (size_t j=0; j<(n*100/TESTS); ++j) printf("|"); 
+        printf("%zu%%\n", (n*100/TESTS));
+        //============================================================
     }
     printf("Results for %d random 3-SAT instances:\n", TESTS);
     printf("Brute Force: %zu/%d solved (%.1f%%)\n", brute_force_count, TESTS, 100.0 * brute_force_count / TESTS);
+    printf("Average Brute Force Time: %f secs\n", brute_force_time_accumaltor / TESTS);
     printf("FAST3SAT: %zu/%d solved (%.1f%%)\n", solver_count, TESTS, 100.0 * solver_count / TESTS);
-    printf("\nPerformance Analysis:\n");
+    printf("Average Solver Time: %f secs\n", solver_time_accumaltor / TESTS);
     printf("FAST3SAT vs Truth:  %.1f%% efficiency\n",brute_force_count > 0 ? 100.0 * solver_count / brute_force_count : 0);
+    printf("FAST3SAT vs Brute Force:  %.1fx faster\n",brute_force_time_accumaltor/TESTS > 0 ? (brute_force_time_accumaltor/TESTS)/(solver_time_accumaltor/TESTS) : 0);
     return 0;
 
 }
