@@ -3,22 +3,28 @@
     <h1>FAST3SAT</h1>
 </div>
 
-A fast, purely deterministic solver for a subset of 3SAT problems. 
-This algorithm uses frequency-based greedy variable assignment to find satisfying solutions in polynomial time. 
+A fast, incomplete solver for a subset of 3SAT problems.
+
+The algorithm combines frequency-based greedy variable assignment with random restarts, making it most closely related to [GSAT](https://cdn.aaai.org/AAAI/1992/AAAI92-068.pdf) (Selman et al., 1992). The differences from GSAT are:
+
+- Greedy construction instead of hill-climbing on a complete assignment: variables are assigned one at a time based on frequency counts rather than flipping variables in a complete assignment.
+- Random restarts over top-K: each retry independently picks from the highest-scoring K unsolved variables at random, breaking the deterministic dead-end of pure greedy without the overhead of GSAT's full flip evaluation.
+
+Like GSAT, this is an incomplete heuristic. It cannot prove unsatisfiability and may fail on satisfiable instances.
 
 ## Benchmark Results
-| M/N Ratio | Success Rate | Use Case                   |
-|-----------|--------------|----------------------------|
-| 1.0       | ~99%         | Under-constrained          |
-| 2.0       | ~83%         | Typical instances          |
-| 4.2       | ~40%-50%     | Phase transition (hardest) |
-| 10.0+     | Variable     | Over-constrained           |
+| M/N Ratio | Success Rate (Benchmarked at) | Use Case                   |
+|-----------|-------------------------------|----------------------------|
+| 1.0       | ~97% (M=80, N=80, T=10, K=3)  | Under-constrained          |
+| 2.0       | ~90% (M=80, N=40, T=10, K=3)  | Typical instances          |
+| 4.2       | ~60% (M=84, N=20, T=10, K=3)  | Phase transition (hardest) |
+| 10.0+     | Variable                      | Over-constrained           |
+
+Benchmarks use planted-solution instances. This gives a accuracy measurement against known-SAT ground truth without requiring brute force.
 
 ## Performance
-- Time Complexity: Polynomial time O(MN) vs exponential for complete solvers
-- Success Rate: 40-99% depending on problem structure
-- Speed: Solves most instances in microseconds
-- Memory: O(M+N) space complexity
+- Time Complexity: O(M*N) per pass, O(retries\*M\*N)
+- Memory: O(M + N) space complexity
 - Best Performance: Under-constrained instances (M/N < 3)
 
 # Use Case
@@ -33,6 +39,6 @@ This algorithm uses frequency-based greedy variable assignment to find satisfyin
 - Phase transition region problems (unless speed > accuracy)
 
 # Limitations
-- Incomplete: Cannot solve all satisfiable instances
-- No backtracking: May get stuck in local optima
-- No clause learning: Doesn't learn from conflicts
+- Incomplete: cannot solve all satisfiable instances and cannot prove unsatisfiability
+- No backtracking: may commit to an assignment that makes later clauses unsatisfiable
+- No clause learning: does not derive new constraints from conflicts (unlike CDCL solvers)
